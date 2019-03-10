@@ -132,31 +132,18 @@
     // Create a variable to reference the database.
     var database = firebase.database();
 
-    var players= 3;
     var player_name, player_hand;
+    var initial_name = "None";
+    var initial_hand = "None";
     var opponent, opponentHand;
     var wins = 0;
     var losses = 0;
     var ties = 0;
     var flag = false;
+    var flag2 = false;
 
-    // Using .on("value", function(snapshot)) syntax will retrieve the data
-    // from the database (both initially and every time something changes)
-    // This will then store the data inside the variable "snap". We could rename "snap" to anything.
-    database.ref().on("value", function(snap) {
-
-        // Update the clickCounter variable with data from the database.
-        if (snap.child("players").exists())
-            players = snap.val().players;
-
-        // If there is an error that Firebase runs into -- it will be stored in the "errorObject"
-        // Again we could have named errorObject anything we wanted.
-        }, function(errorObject) {
-
-        // In case of error this will print the error
-        console.log("The read failed: " + errorObject.code);
-    });
-
+    opponent = initial_name;
+    opponent_hand = initial_hand;
 
     // At the page hand value updates, get a snapshot of the local data.
     // This function allows you to update your page in real-time when the values within the firebase node bidderData changes
@@ -165,18 +152,25 @@
         // Set the local variables for opponent equal to the stored values in firebase.
        if (snapshot.child("opponent").exists() && snapshot.child("opponentHand").exists()) {
 
-            if (player_name !== snapshot.val().opponent && flag) {// Print the local data to the console.
+            if (player_name !== snapshot.val().opponent) {
                 
                 opponent = snapshot.val().opponent;
                 opponentHand = snapshot.val().opponentHand;
                 console.log(opponent);
                 console.log(opponentHand);
 
+                $("#message_board").prepend('<p>' + opponent + ' has drawn his hand.</p>');
+                
+                flag2 = true;
+            }
+
+            if (flag && flag2) {
+
                 if ((player_hand === "r" && opponentHand === "s") ||
                     (player_hand === "s" && opponentHand === "p") || 
                     (player_hand === "p" && opponentHand === "r")) {
                     wins++;
-                    $("#im").prepend('<p>You won!</p>');
+                    $("#message_board").prepend('<p>You won!</p>');
                 } else if (player_hand === opponentHand) {
                     ties++;
                     $("#message_board").prepend('<p>It is a tie!</p>');
@@ -185,10 +179,10 @@
                     $("#message_board").prepend('<p>You lost!</p>');
                 }
 
-                opponent = "";
-                opponentHand = "";
+                opponent = initial_name;
+                opponentHand = initial_hand;
                 flag = false;
-                players = 3;
+                flag2 = false;
             }
         }
         // If any errors are experienced, log them to console.
@@ -201,25 +195,17 @@
     $("#start_button").on("click", function(event) {
         event.preventDefault(); 
 
-        //players--;
-
-        if (players === 0)
-            $("#online_users").text("Sorry, only 2 players allowed to play at a time. Try again later!");
-        else {
-             // Get the input values
             player_name = $("#name-input").val().trim();
-            database.ref().set({
-            players: players
-            });
+
             $("#start_button").hide();
             $("#entry-form").hide();
             $("#name-input").val('');
             $("#name-input").hide();
             $("#online_users").text("Gloves off. Choose your hand wisely."); 
+            $("#message_board").empty();
             $("#status").show(); 
-        }     
+           
     }); 
-
 
     $(".clicked").on("click", function() {
 
@@ -232,6 +218,7 @@
         });
 
         flag = true;
+
     });
         
     </script>
