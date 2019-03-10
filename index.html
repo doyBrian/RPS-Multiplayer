@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CDN-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
+
+    <link href="https://fonts.googleapis.com/css?family=Alfa+Slab+One" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Amatic+SC" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nothing+You+Could+Do" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Anton" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
+
+    <style>
+
+        header {
+            margin: 0 auto;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        #font_1 {
+            font-family: 'Alfa Slab One', cursive;
+            font-size: 70px;
+            width: 500px;
+        }
+
+        #font_2 {
+            font-family: 'Amatic SC', cursive;
+            font-size: 80px;
+            font-weight: bold;
+            width: 500px;
+        }
+
+        #font_3 {
+            font-family: 'Nothing You Could Do', cursive;
+            font-size: 70px;
+            width: 500px;
+        }
+
+        #online_users {
+            margin-top: 15px;
+        }
+
+        img {
+            margin-top: 10px;
+            width: 200px;
+            height: 200px;
+        }
+
+        form {
+            margin-top: 15px;
+        }
+
+        p {
+            margin-top: 10px;
+        }
+
+       #status {
+           margin-top: 40px;
+       }
+
+       h5 {
+        font-family: 'Anton', sans-serif;
+       }
+
+    </style>
+</head>
+<body>
+
+    <header class="animated fadeInDownBig delay-4s">
+        <h1 id="font_1" style="display: inline">ROCK </h1><h1 id="font_2" style="display: inline"> PAPER </h1><h1 id="font_3" style="display: inline"> SCISSORS</h1>
+    </header>
+
+    <div class="container">        
+        <div id="main_content" class="row text-center">
+            <div class="col-12">
+                <a class="clicked" data-btnID="r" href="#"><img class="animated bounce delay-1s" src="Rock.jpg"></a>
+                <a class="clicked" data-btnID="p" href="#"><img class="animated bounce delay-2s" src="Paper.jpg"></a>
+                <a class="clicked" data-btnID="s" href="#"><img class="animated bounce delay-3s" src="scissors.png"></a>
+                <h5 id="online_users" class="text-center"></h5>
+                <div class="row justify-content-center">
+                    <div class="col-4 animated bounceInUp slow delay-5s">
+                        <form id="entry-form">
+                            <div class="form-group">
+                                <input type="name" class="form-control" id="name-input" aria-describedby="username" placeholder="Enter name">
+                            </div>
+                        </form>
+                        <button id="start_button" type="button" class="btn btn-dark">Play</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="status" style="display: none" class="row">
+            <h5>Message Board</h5>
+            <div id="message_board" class="col-12">
+  
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+    /* global moment firebase */
+    // Initialize Firebase
+    // Make sure to match the configuration to the script version number in the HTML
+    // (Ex. 3.0 != 3.7.0)
+    var config = {
+        apiKey: "AIzaSyBX8kYiMF6cLoPj7JCtTkTO8w9riKNgZiU",
+        authDomain: "rock-paper-scissors-4bca5.firebaseapp.com",
+        databaseURL: "https://rock-paper-scissors-4bca5.firebaseio.com",
+        projectId: "rock-paper-scissors-4bca5",
+        storageBucket: "rock-paper-scissors-4bca5.appspot.com",
+        messagingSenderId: "724862951295"
+    };
+    firebase.initializeApp(config);
+
+    // Create a variable to reference the database.
+    var database = firebase.database();
+
+    var players= 3;
+    var player_name, player_hand;
+    var opponent, opponentHand;
+    var wins = 0;
+    var losses = 0;
+    var ties = 0;
+    var flag = false;
+
+    // Using .on("value", function(snapshot)) syntax will retrieve the data
+    // from the database (both initially and every time something changes)
+    // This will then store the data inside the variable "snap". We could rename "snap" to anything.
+    database.ref().on("value", function(snap) {
+
+        // Update the clickCounter variable with data from the database.
+        if (snap.child("players").exists())
+            players = snap.val().players;
+
+        // If there is an error that Firebase runs into -- it will be stored in the "errorObject"
+        // Again we could have named errorObject anything we wanted.
+        }, function(errorObject) {
+
+        // In case of error this will print the error
+        console.log("The read failed: " + errorObject.code);
+    });
+
+
+    // At the page hand value updates, get a snapshot of the local data.
+    // This function allows you to update your page in real-time when the values within the firebase node bidderData changes
+    database.ref("/handData").on("value", function(snapshot) {
+
+        // Set the local variables for opponent equal to the stored values in firebase.
+       if (snapshot.child("opponent").exists() && snapshot.child("opponentHand").exists()) {
+
+            if (player_name !== snapshot.val().opponent && flag) {// Print the local data to the console.
+                
+                opponent = snapshot.val().opponent;
+                opponentHand = snapshot.val().opponentHand;
+                console.log(opponent);
+                console.log(opponentHand);
+
+                if ((player_hand === "r" && opponentHand === "s") ||
+                    (player_hand === "s" && opponentHand === "p") || 
+                    (player_hand === "p" && opponentHand === "r")) {
+                    wins++;
+                    $("#im").prepend('<p>You won!</p>');
+                } else if (player_hand === opponentHand) {
+                    ties++;
+                    $("#message_board").prepend('<p>It is a tie!</p>');
+                } else {
+                    losses++;
+                    $("#message_board").prepend('<p>You lost!</p>');
+                }
+
+                opponent = "";
+                opponentHand = "";
+                flag = false;
+                players = 3;
+            }
+        }
+        // If any errors are experienced, log them to console.
+        }, function(errorObject) {
+        console.log("The read failed: " + errorObject.code);
+    });
+    
+    // --------------------------------------------------------------
+    // Whenever a user clicks the start button
+    $("#start_button").on("click", function(event) {
+        event.preventDefault(); 
+
+        //players--;
+
+        if (players === 0)
+            $("#online_users").text("Sorry, only 2 players allowed to play at a time. Try again later!");
+        else {
+             // Get the input values
+            player_name = $("#name-input").val().trim();
+            database.ref().set({
+            players: players
+            });
+            $("#start_button").hide();
+            $("#entry-form").hide();
+            $("#name-input").val('');
+            $("#name-input").hide();
+            $("#online_users").text("Gloves off. Choose your hand wisely."); 
+            $("#status").show(); 
+        }     
+    }); 
+
+
+    $(".clicked").on("click", function() {
+
+        player_hand = $(this).attr("data-btnID");
+        console.log(player_hand); 
+
+        database.ref("/handData").set({
+            opponent: player_name,
+            opponentHand: player_hand
+        });
+
+        flag = true;
+    });
+        
+    </script>
+</body>
+</html>
