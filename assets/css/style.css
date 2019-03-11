@@ -1,0 +1,56 @@
+        header {
+            margin: 0 auto;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        #font_1 {
+            font-family: 'Alfa Slab One', cursive;
+            font-size: 70px;
+            width: 500px;
+        }
+
+        #font_2 {
+            font-family: 'Amatic SC', cursive;
+            font-size: 80px;
+            font-weight: bold;
+            width: 500px;
+        }
+
+        #font_3 {
+            font-family: 'Nothing You Could Do', cursive;
+            font-size: 70px;
+            width: 500px;
+        }
+
+        #online_users {
+            margin-top: 15px;
+        }
+
+        img {
+            margin-top: 10px;
+            width: 200px;
+            height: 200px;
+        }
+
+        #entry-form {
+            margin-top: 15px;
+        }
+
+        p {
+            margin-top: 15px;
+        }
+
+       #status {
+           margin-top: 20px;
+       }
+
+       h5 {
+        font-family: 'Anton', sans-serif;
+       }
+
+       #message-area {
+           margin-top: 15px;
+       }
+
+    

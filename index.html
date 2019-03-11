@@ -6,14 +6,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 
-    <!-- jQuery -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    
     <!-- Bootstrap CDN-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-
-    <!-- Firebase Reference -->
-    <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
 
     <link href="https://fonts.googleapis.com/css?family=Alfa+Slab+One" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Amatic+SC" rel="stylesheet">
@@ -22,73 +19,27 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
 
-    <style>
+    <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/5.8.6/firebase.js"></script>
 
-        header {
-            margin: 0 auto;
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        #font_1 {
-            font-family: 'Alfa Slab One', cursive;
-            font-size: 70px;
-            width: 500px;
-        }
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-        #font_2 {
-            font-family: 'Amatic SC', cursive;
-            font-size: 80px;
-            font-weight: bold;
-            width: 500px;
-        }
-
-        #font_3 {
-            font-family: 'Nothing You Could Do', cursive;
-            font-size: 70px;
-            width: 500px;
-        }
-
-        #online_users {
-            margin-top: 15px;
-        }
-
-        img {
-            margin-top: 10px;
-            width: 200px;
-            height: 200px;
-        }
-
-        form {
-            margin-top: 15px;
-        }
-
-        p {
-            margin-top: 10px;
-        }
-
-       #status {
-           margin-top: 40px;
-       }
-
-       h5 {
-        font-family: 'Anton', sans-serif;
-       }
-
-    </style>
 </head>
 <body>
-
+    <iframe src="assets/audio/bensound-punky.mp3" allow="autoplay" style="display:none" id="iframeAudio"></iframe>
+    
     <header class="animated fadeInDownBig delay-4s">
-        <h1 id="font_1" style="display: inline">ROCK </h1><h1 id="font_2" style="display: inline"> PAPER </h1><h1 id="font_3" style="display: inline"> SCISSORS</h1>
+        <h1 id="font_1" style="display: inline;">ROCK </h1><h1 id="font_2" style="display: inline;"> PAPER </h1><h1 id="font_3" style="display: inline;"> SCISSORS</h1>
     </header>
 
+    <!--Header, start button-->
     <div class="container">        
         <div id="main_content" class="row text-center">
             <div class="col-12">
-                <a class="clicked" data-btnID="r" href="#"><img class="animated bounce delay-1s" src="Rock.jpg"></a>
-                <a class="clicked" data-btnID="p" href="#"><img class="animated bounce delay-2s" src="Paper.jpg"></a>
-                <a class="clicked" data-btnID="s" href="#"><img class="animated bounce delay-3s" src="scissors.png"></a>
+                <a class="clicked" data-btnID="r" href="#"><img class="animated bounce delay-1s" src="assets/images/Rock.jpg"></a>
+                <a class="clicked" data-btnID="p" href="#"><img class="animated bounce delay-2s" src="assets/images/Paper.jpg"></a>
+                <a class="clicked" data-btnID="s" href="#"><img class="animated bounce delay-3s" src="assets/images/scissors.png"></a>
                 <h5 id="online_users" class="text-center"></h5>
                 <div class="row justify-content-center">
                     <div class="col-4 animated bounceInUp slow delay-5s">
@@ -103,124 +54,27 @@
             </div>
         </div>
     </div>
+    <!--messenger form-->
+    <div class="row justify-content-center">
+        <div id="message-form" style="display: none;" class="col-4">
+            <div class="form-group">
+                <textarea class="form-control" id="message-area" rows="3"></textarea>
+            </div>
+            <button id="IM_button" type="button" class="btn btn-dark">Send IM</button>
+        </div>
+    </div>
+    
 
+    <!--message board-->
     <div class="container">
-        <div id="status" style="display: none" class="row">
+        <div id="status" style="display: none;" class="row">
             <h5>Message Board</h5>
-            <div id="message_board" class="col-12">
-  
+            <div id="message_board" class="col-12 border-top border-dark">
             </div>
         </div>
     </div>
-
-    <script>
-
-    /* global moment firebase */
-    // Initialize Firebase
-    // Make sure to match the configuration to the script version number in the HTML
-    // (Ex. 3.0 != 3.7.0)
-    var config = {
-        apiKey: "AIzaSyBX8kYiMF6cLoPj7JCtTkTO8w9riKNgZiU",
-        authDomain: "rock-paper-scissors-4bca5.firebaseapp.com",
-        databaseURL: "https://rock-paper-scissors-4bca5.firebaseio.com",
-        projectId: "rock-paper-scissors-4bca5",
-        storageBucket: "rock-paper-scissors-4bca5.appspot.com",
-        messagingSenderId: "724862951295"
-    };
-    firebase.initializeApp(config);
-
-    // Create a variable to reference the database.
-    var database = firebase.database();
-
-    var player_name, player_hand;
-    var initial_name = "None";
-    var initial_hand = "None";
-    var opponent, opponentHand;
-    var wins = 0;
-    var losses = 0;
-    var ties = 0;
-    var flag = false;
-    var flag2 = false;
-
-    opponent = initial_name;
-    opponent_hand = initial_hand;
-
-    // At the page hand value updates, get a snapshot of the local data.
-    // This function allows you to update your page in real-time when the values within the firebase node bidderData changes
-    database.ref("/handData").on("value", function(snapshot) {
-
-        // Set the local variables for opponent equal to the stored values in firebase.
-       if (snapshot.child("opponent").exists() && snapshot.child("opponentHand").exists()) {
-
-            if (player_name !== snapshot.val().opponent) {
-                
-                opponent = snapshot.val().opponent;
-                opponentHand = snapshot.val().opponentHand;
-                console.log(opponent);
-                console.log(opponentHand);
-
-                $("#message_board").prepend('<p>' + opponent + ' has drawn his hand.</p>');
-                
-                flag2 = true;
-            }
-
-            if (flag && flag2) {
-
-                if ((player_hand === "r" && opponentHand === "s") ||
-                    (player_hand === "s" && opponentHand === "p") || 
-                    (player_hand === "p" && opponentHand === "r")) {
-                    wins++;
-                    $("#message_board").prepend('<p>You won!</p>');
-                } else if (player_hand === opponentHand) {
-                    ties++;
-                    $("#message_board").prepend('<p>It is a tie!</p>');
-                } else {
-                    losses++;
-                    $("#message_board").prepend('<p>You lost!</p>');
-                }
-
-                opponent = initial_name;
-                opponentHand = initial_hand;
-                flag = false;
-                flag2 = false;
-            }
-        }
-        // If any errors are experienced, log them to console.
-        }, function(errorObject) {
-        console.log("The read failed: " + errorObject.code);
-    });
     
-    // --------------------------------------------------------------
-    // Whenever a user clicks the start button
-    $("#start_button").on("click", function(event) {
-        event.preventDefault(); 
-
-            player_name = $("#name-input").val().trim();
-
-            $("#start_button").hide();
-            $("#entry-form").hide();
-            $("#name-input").val('');
-            $("#name-input").hide();
-            $("#online_users").text("Gloves off. Choose your hand wisely."); 
-            $("#message_board").empty();
-            $("#status").show(); 
-           
-    }); 
-
-    $(".clicked").on("click", function() {
-
-        player_hand = $(this).attr("data-btnID");
-        console.log(player_hand); 
-
-        database.ref("/handData").set({
-            opponent: player_name,
-            opponentHand: player_hand
-        });
-
-        flag = true;
-
-    });
-        
-    </script>
+    <script src="assets/javascript/game.js"></script>
+    
 </body>
 </html>
