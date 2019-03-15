@@ -5,6 +5,9 @@ A multiplayer app for Rock Paper Scissors game
 
 This is a Rock Paper Scissors game that is an online multiplayer game, all with the help of Firebase and the necessary web development elements.
 
+### Deployed Site Link
+https://doybrian.github.io/RPS-Multiplayer/
+
 ### Game Design Setup
 
 * The game will match two hand choices at a time. Flags are set up so that the game can keep track of when the player picks a choice and if another player has made one to pair with for the round/match. Once a round or match is decided, the database will be cleared to make way for another round of hand choices. Basically, the first two hand choices that gets fired up will be paired together. This serves the multiplayer functionality of the game. 
