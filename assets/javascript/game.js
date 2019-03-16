@@ -17,8 +17,7 @@
 
     //variable declarations and initialization
     var player_name, player_hand;
-    var opponent = null;
-    var opponentHand = null;
+    var opponent, opponentHand;
     var wins = 0;
     var losses = 0;
     var ties = 0;
@@ -41,7 +40,8 @@
                 if (player_name !== snapshot.val().opponent) {
                     counter++;
 
-                    if(counter <= 1) {
+                    //allow only 1 opponent to be matched with player
+                    if(counter === 1) {
                     opponent = snapshot.val().opponent;
                     opponentHand = snapshot.val().opponentHand;
                     console.log(opponent);
@@ -56,11 +56,11 @@
 
                     check_winner(); 
 
-                    } else if (counter > 1) {
+                    } else {
 
                         opponent = snapshot.val().opponent;
                         $("#message_board").prepend('<p>' + opponent + ' has picked a hand!</p>');
-                        $("#message_board").prepend('<p>A match has been decided  that you were not a part of.</p>');
+                        $("#message_board").prepend('<p>A match has been decided that you were not a part of.</p>');
                         
                         sound_effect = new sound("./assets/audio/Alert.mp3");
                         sound_effect.play();
@@ -109,7 +109,7 @@
 
     //checks winner after player and opponent has entered choice
     function check_winner() {
-        if (flag && flag2 && opponent != null) {
+        if (flag && flag2) {
 
             if ((player_hand === "r" && opponentHand === "s") ||
                 (player_hand === "s" && opponentHand === "p") || 
@@ -130,7 +130,7 @@
             //reset flags after each round is done
             flag = false;
             flag2 = false;
-            counter = 0;
+            counter = 0; //clear opponent count to allow for another opponent
 
             //clears all information in database after each round
             database.ref("/handData").set({
