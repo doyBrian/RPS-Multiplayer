@@ -17,7 +17,8 @@
 
     //variable declarations and initialization
     var player_name, player_hand;
-    var opponent, opponentHand;
+    var opponent = null;
+    var opponentHand = null;
     var wins = 0;
     var losses = 0;
     var ties = 0;
@@ -25,6 +26,7 @@
     var flag2 = false; //flag if opponent has entered choice
     var instant_message;
     var sound_effect;
+    var counter = 0;
 
 
     // At the page hand value updates, get a snapshot of the local data.
@@ -37,22 +39,44 @@
            if (snapshot.val().opponent != null || snapshot.val().opponentHand != null) {
 
                 if (player_name !== snapshot.val().opponent) {
-                    
+                    counter++;
+
+                    if(counter <= 1) {
                     opponent = snapshot.val().opponent;
                     opponentHand = snapshot.val().opponentHand;
                     console.log(opponent);
                     console.log(opponentHand);
-
+                    
                     $("#message_board").prepend('<p>' + opponent + ' has picked a hand!</p>');
-
+                    
                     sound_effect = new sound("./assets/audio/Alert.mp3");
                     sound_effect.play();
                     
                     flag2 = true;
+
+                    check_winner(); 
+
+                    } else if (counter > 1) {
+
+                        opponent = snapshot.val().opponent;
+                        $("#message_board").prepend('<p>' + opponent + ' has picked a hand!</p>');
+                        $("#message_board").prepend('<p>A match has been decided  that you were not a part of.</p>');
+                        
+                        sound_effect = new sound("./assets/audio/Alert.mp3");
+                        sound_effect.play();
+
+                        flag2 = false;
+                        counter = 0;
+
+                        //clears all information in database after each round
+                        database.ref("/handData").set({
+                        opponent: null,
+                        opponentHand: null
+                        });    
+                    }             
                 }
-                check_winner();                  
             } 
-        }
+       }
         // If any errors are experienced, log them to console.
         }, function(errorObject) {
         console.log("The read failed: " + errorObject.code);
@@ -85,7 +109,7 @@
 
     //checks winner after player and opponent has entered choice
     function check_winner() {
-        if (flag && flag2) {
+        if (flag && flag2 && opponent != null) {
 
             if ((player_hand === "r" && opponentHand === "s") ||
                 (player_hand === "s" && opponentHand === "p") || 
@@ -106,6 +130,7 @@
             //reset flags after each round is done
             flag = false;
             flag2 = false;
+            counter = 0;
 
             //clears all information in database after each round
             database.ref("/handData").set({
@@ -139,6 +164,8 @@
     //function when a hand is picked to play game
     $(".clicked").on("click", function() {
 
+        if (!flag) {
+
         player_hand = $(this).attr("data-btnID");
 
         $("#message_board").prepend('<p>You have picked a hand.</p>');
@@ -154,6 +181,8 @@
         flag = true;
 
         check_winner();
+    } else
+        $("#message_board").prepend("<p>You already picked a hand. Waiting for an opponent's pick to match yours with.</p>");
 
     });
 
